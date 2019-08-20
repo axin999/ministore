@@ -19,6 +19,7 @@ let AppLayout = require('./components/App.vue');
 
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+import VueResource from 'vue-resource';
 import { Form, HasError, AlertError } from 'vform';
 import moment from 'moment';
 import VueProgressBar from 'vue-progressbar';
@@ -32,6 +33,9 @@ window.VueFire = new Vue();
 Vue.use(VueRouter,VueAxios,Axios,VueProgressBar);
 Vue.component(HasError.name, HasError)
 Vue.component(AlertError.name, AlertError)
+
+
+
 
 //const Userlist = Vue.component('Userlist', require('./components/Userlist.vue') );
 const toast = Swal.mixin({
@@ -61,6 +65,10 @@ const routes = [
 {	
 	path: '/users',
 	component: require('./components/Userlist.vue')
+},
+{ 
+  path: '/developer',
+  component: require('./components/Developer.vue')
 }
 
 ]
@@ -86,6 +94,20 @@ Vue.filter('timeToStrFromat',function(getTime){
 
 //Vue.component('example', require('./components/Example.vue'));
 
+Vue.component(
+    'passport-clients',
+    require('./components/passport/Clients.vue')
+);
+
+Vue.component(
+    'passport-authorized-clients',
+    require('./components/passport/AuthorizedClients.vue')
+);
+
+Vue.component(
+    'passport-personal-access-tokens',
+    require('./components/passport/PersonalAccessTokens.vue')
+);
 const app = new Vue({
   el: '#app',
   router,
