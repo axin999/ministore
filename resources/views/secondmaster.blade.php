@@ -178,6 +178,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
 				</router-link>
 			</li>
 			<li class="nav-item">
+				<router-link to="/profile" class="nav-link">
+				<i class="nav-icon fas fa-user text-orange"></i>
+				<p>
+					Profile
+					{{-- <span class="right badge badge-danger">New</span> --}}
+				</p>
+				</router-link>
+			</li>
+			<li class="nav-item">
 				<router-link to="/developer" class="nav-link">
 					<i class="nav-icon fas fa-cogs"></i>
 					<p>
@@ -202,7 +211,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			</li>
           <li class="nav-item has-treeview menu-open">
             <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-cog text-orange"></i>
+              <i class="nav-icon fas fa-cog text-green"></i>
               <p>
                 Management
                 <i class="right fas fa-angle-left"></i>
