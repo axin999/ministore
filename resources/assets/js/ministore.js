@@ -14,7 +14,7 @@ $(document).ready(function() {
 				$('#'+storedTabId).children().addClass('active show');
 		break;
 		case 'navAdditems':
-				$('#items').addClass('active show');
+				$('#additems').addClass('active show');
 				$('#'+storedTabId).children().addClass('active show');				
 		break;
 		case 'navAddCategory':
@@ -31,6 +31,7 @@ $(document).ready(function() {
 	}
 	
     console.log(storedTabId);
+    loadcategoryselect();
 });
 
 $('.nav-item').click(function(){
@@ -89,14 +90,13 @@ $("#CategoryBtnUpdate").click(function(){
 
 $("#PriceSetBtnUpdate").click(function(){
 	var datpriceset = [];
-	var valuuepriceset = $("#PriceSetType").val();
-	console.log(valuuepriceset);
 
 	$(".PriceSetType").each(function () {
 
-   	var dataidset = $(this).parent().parent().data('pricesetid');                
+   	var dataidset = $(this).parent().parent().data('pricesetid');
+   	var pricesetval =  $(this).val();               
 
-	    if(dataidset==null && PriceSetType!= null){
+	    if(dataidset==null && pricesetval!= null){
 	    	var current_priceset_id = $(this).val();
 	    	datpriceset.push(current_priceset_id);
 	    }
@@ -154,7 +154,7 @@ $("#navpriceset").click(function(){
 	});
 });
 
-$("#asdf").click(function(){
+$("#addElement_btn").click(function(){
 	$("#contentPanel").append(createPriceSetElement());
 });
 
@@ -181,51 +181,8 @@ $('#contentPanel').on( "click",".removeDescription", function() {
 	}
 });
 
-function getCategoryIdName(){
-	
-	categoryName = $(event.target).closest("tr").find(".categorynamevalue").text();
-	categoryId = $(event.target).parent().parent().children().first().data("categoryid");
-	console.log('currentcategotyid',categoryId);
-	var arr = {'categoryName':categoryName,'categoryId':categoryId};
-	return arr;
-
-}
-
-function createPriceSetElement(itemvalue, itemid){
-	var textstatus = 'disabled';
-	if(itemvalue==null){
-		itemvalue = '';
-	}
-	if(itemid==null){
-		itemid=null;
-		textstatus ='';
-	}
-	var element =' <div class="col-sm-6 d-flex" data-pricesetid='+itemid+'>\
-			<div class="col-sm-4 d-flex justify-content-center">\
-                <label>Description</label>\
-             </div>\
-             <div class="col-sm-6 d-flex justify-content-start">\
-               <input class="form-control w-100 PriceSetType" type="text" name="PriceSetType" id="PriceSetType" value="'+itemvalue+'" '+textstatus+'>\
-             </div>\
-             <div class="col-sm-2">\
-               <button type="button" class="btn btn-xs btn-danger removeDescription">x</button>\
-               <button type="button" class="btn btn-xs btn-danger editDescription">e</button>\
-             </div>\
-             </div>';
-    //below is javascript sample for inner html class to work.       
-    //document.getElementsByClassName("priceSetRow")[0].innerHTML += element; 
-    $( ".priceSetRow" ).append(element);
 
 
-}
-
-function forEachdataPirceset(item, index){
- 	createPriceSetElement(item.priceset_type,item.priceset_id);
-}
-function getCurrentpsetId(){
-	pricesetId = $(event.target).parent().parent().data('pricesetid');
-	return pricesetId;
-}
 $( "#addPriceSet" ).on( "click", "#testingBtn", function( event ) {
 //var getPricesetValue = $(".PriceSetType").val();
 //console.log(getPricesetValue);
@@ -259,3 +216,124 @@ $.ajax({
 	
 })
 });
+
+$(".category-row").on('change','#category_select',function(){
+	var categoryselect = $("#category_select").val();
+	$(".priceset").remove();
+	$.ajax({
+		method:'GET',
+		data:{categoryid:categoryselect,_token:token},
+		url:'showpricesets',
+		success:function(data){
+			$.each(data, function(index,value){
+				
+				$(".category-row").append('<div class="form-group priceset"><input type="text" placeholder="Price For '+value.priceset_type+'" data-additempriceset="'+value.id+'" value="" class="form-control price-value"></div>')
+			})
+			console.log(data);
+		}
+	})
+	
+});
+
+
+//submit add item
+
+$('#submit_additem').click(function(){
+	var itemname = $('#item_name').val();
+	var category_id = $('#category_select').attr('id');
+	var description = $('#description').val();
+	var quantity = $('#quantity').val();
+
+
+	//var price2 = $.each(price, (i, e) => console.log(e.value.get()));
+	//var price2 = price.map((i, e) => e.value).get();
+
+//alert(JSON.stringify(kabayo));
+var myArray = new Array();
+/*var priceid = $('.price-value')
+  .map(function() {
+    return [$.map($(this).data(),function(value){
+    	return value;
+    })];
+  })
+  .get();*/
+
+let prices = [];
+$(".price-value").each(function() {
+	prices.push([$(this).data('additempriceset'),$(this).val()]);
+});
+
+
+var kabayo = {itemname:itemname,description:description,quantity:quantity,prices:prices}
+console.log(prices[0][1]);
+
+	$.ajax({
+		method:'post',
+		type:JSON,
+		data:{itemname:itemname,description:description,quantity:quantity,_token:token,prices:prices},
+		url:'additem',
+		success:function(data){
+			console.log(data);
+		}
+
+	})
+})
+
+
+function getCategoryIdName(){
+	
+	categoryName = $(event.target).closest("tr").find(".categorynamevalue").text();
+	categoryId = $(event.target).parent().parent().children().first().data("categoryid");
+	console.log('currentcategotyid',categoryId);
+	var arr = {'categoryName':categoryName,'categoryId':categoryId};
+	return arr;
+
+}
+
+function createPriceSetElement(itemvalue, itemid){
+	var textstatus = 'disabled';
+	if(itemvalue==null){
+		itemvalue = '';
+	}
+	if(itemid==null){
+		itemid=null;
+		textstatus ='';
+	}
+	var element =' <div class="col-sm-6 d-flex" data-pricesetid='+itemid+'>\
+			<div class="col-sm-4 d-flex justify-content-center">\
+                <label>Description</label>\
+             </div>\
+             <div class="col-sm-6 d-flex justify-content-start">\
+               <input class="form-control w-100 PriceSetType" type="text" name="PriceSetType" value="'+itemvalue+'" '+textstatus+'>\
+             </div>\
+             <div class="col-sm-2">\
+               <button type="button" class="btn btn-xs btn-danger removeDescription">x</button>\
+               <button type="button" class="btn btn-xs btn-danger editDescription">e</button>\
+             </div>\
+             </div>';
+    //below is javascript sample for inner html class to work.       
+    //document.getElementsByClassName("priceSetRow")[0].innerHTML += element; 
+    $( ".priceSetRow" ).append(element);
+
+
+}
+
+function forEachdataPirceset(item, index){
+ 	createPriceSetElement(item.priceset_type,item.id);
+}
+
+function loadcategoryselect(){
+	$.ajax({
+		method:'GET',
+		url:'/getcategory',
+		success:function(data){
+			$.each(data, function(index,value){
+				$('#category_select').append('<option value="'+value.id+'">'+value.category_name+'</option>')	;			
+			})
+		}
+	})
+}
+function getCurrentpsetId(){
+	pricesetId = $(event.target).parent().parent().data('pricesetid');
+	return pricesetId;
+}

@@ -24,6 +24,10 @@ import { Form, HasError, AlertError } from 'vform';
 import moment from 'moment';
 import VueProgressBar from 'vue-progressbar';
 import Swal from 'sweetalert2';
+import Gate from './Gate';
+
+Vue.prototype.$gate = new Gate(window.user);
+
 
 window.Form = Form;
 window.swal = Swal;
@@ -34,6 +38,7 @@ Vue.use(VueRouter,VueAxios,Axios,VueProgressBar);
 Vue.component(HasError.name, HasError)
 Vue.component(AlertError.name, AlertError)
 
+Vue.component('pagination',require('laravel-vue-pagination'));
 
 
 
@@ -59,17 +64,12 @@ const routes = [
 	component: require('./components/Profile')
 },
 /*{	path: '/home',name:'profile', component: require('./components/Profile')},*/
-{	path: '/dashboard',
-	component: require('./components/Dashboard') 
-},
-{	
-	path: '/users',
-	component: require('./components/Userlist.vue')
-},
-{ 
-  path: '/developer',
-  component: require('./components/Developer.vue')
-}
+{	path: '/dashboard',component: require('./components/Dashboard') },
+{	path: '/users',component: require('./components/Userlist.vue')},
+{ path: '/developer',component: require('./components/Developer.vue')},
+{ path: '/addcategories',component: require('./components/CategoryPrice.vue')},
+{ path: '/pricelist',component: require('./components/Pricelist.vue')},
+{ path: '*',component: require('./components/NotFound.vue')}
 
 ]
 
@@ -108,9 +108,26 @@ Vue.component(
     'passport-personal-access-tokens',
     require('./components/passport/PersonalAccessTokens.vue')
 );
+
+Vue.component(
+    'not-found',
+    require('./components/NotFound.vue')
+);
 const app = new Vue({
   el: '#app',
   router,
-  AppLayout
+  data:{
+    search:'',
+    dashboard:''
+  },
+  AppLayout,
+  methods:{
+    searchit: _.debounce(() =>{
+      VueFire.$emit('searching');
+    },2000),
+    boom(){
+      alert('boom');
+    }
+  }
 });
 

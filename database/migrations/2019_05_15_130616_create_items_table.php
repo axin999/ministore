@@ -16,7 +16,10 @@ class CreateItemsTable extends Migration
             Schema::dropIfExists('items');
             Schema::create('items', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('category_id');
             $table->string('name');
+            $table->mediumText('description');
+            $table->integer('quantity');
             $table->string('slug')->nullable();
             $table->timestamps();
         });

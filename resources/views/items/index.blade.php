@@ -1,33 +1,11 @@
-@extends('master')
+@extends('secondmaster')
 @section('title', 'Add Items')
 @section('content')
 @include('items.modal')
-<ul class="nav nav-tabs">
-	<li class="nav-item" id="navPricelist">
-		<a class="nav-link" data-toggle="tab" href="#pricelist">Price List</a>
-	</li>
-	<li class="nav-item" id="navAdditems">
-		<a class="nav-link" data-toggle="tab" href="#items">Add Item</a>
-	</li>
-	<li class="nav-item" id="navAddCategory">
-		<a class="nav-link" data-toggle="tab" href="#category">Add Category</a>
-	</li>
-	<li class="nav-item" id="navPriceset">
-		<a class="nav-link" data-toggle="tab" href="#priceset">Price Set</a>
-	</li>
-	<li class="nav-item dropdown">
-		<a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
-		<div class="dropdown-menu">
-			<a class="dropdown-item" href="#">Action</a>
-			<a class="dropdown-item" href="#">Another action</a>
-			<a class="dropdown-item" href="#">Something else here</a>
-			<div class="dropdown-divider"></div>
-			<a class="dropdown-item" href="#">Separated link</a>
-		</div>
-	</li>
-</ul>
+<div id="pricesection">
+
 <div id="myTabContent" class="tab-content">
-	<div class="tab-pane fade" id="pricelist">
+	{{-- <div class="tab-pane fade" id="pricelist">
 		@foreach ($errors->all() as $error)
 		<p class="alert alert-danger">{{ $error }}</p>
 		<p>ussy</p>
@@ -52,10 +30,10 @@
 			</div>
 			</center>
 		</form>
-		<input type="text" name="">
-	</div>
-	<div class="tab-pane fade" id="items">
-		<div>
+	</div> --}}
+	<div class="tab-pane fade" id="additems">
+{{-- 		<div class="row">
+			<div class="col-md-12">
 			<form method="post">
 				@if (session('status'))
 				<div class="alert alert-success">
@@ -63,25 +41,77 @@
 				</div>
 				@endif
 				{!! csrf_field() !!}
-				<center>
-				<div class="card text-white bg-success mb-3" style="max-width: 40rem; margin-top: 2rem;">
+				
+				<div class="card text-white bg-success mb-3">
 					<div class="card-header">Add Item</div>
 					<div class="card-body">
+						
+							
 						<fieldset>
+						<div class="form-group">
+							<div class="col-md-5">
 							<h4>Item Name:</h4><input type="text" class="form-control" id="name" placeholder="Item Name" name="name">
 							<h4>Price</h4>
-							<label>Whole Sale:</label><input type="text" class="form-control" id="name" placeholder="Item Name" name="name">
-							<label>Half:</label><input type="text" class="form-control" id="name" placeholder="Item Name" name="name">
+							<label>Description:</label><input type="text" class="form-control" id="name" placeholder="Item Name" name="name">
+							<label>Quantity:</label><input type="text" class="form-control" id="name" placeholder="Item Name" name="name">
 							<label>Per piece:</label><input type="text" class="form-control" id="name" placeholder="Item Name" name="name">
 							<strong>{{ $errors->first('name') }}</strong>
 							<button type="submit" class="btn btn-primary">Submit</button>
+						</div>
+						</div>
+						<div class="form-group">
+							<div class="col-md-5">
+								<div class="dropdown mt-2">
+									<button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									Select Category
+									</button>
+									<div class="dropdown-menu bg-primary" aria-labelledby="dropdownMenuButton">
+										<a class="dropdown-item text-primary" href="#">Action</a>
+										<a class="dropdown-item text-primary" href="#">Another action</a>
+										<a class="dropdown-item text-primary" href="#">Something else here</a>
+									</div>
+								</div>
+
+						</div>
+						</div>
 						</fieldset>
 					</div>
 				</div>
-				</center>
+
 			</form>
-		</div>
+			</div>
+		</div> --}}
+
+                                <h3 class="register-heading">Add Items</h3>
+                                <form method="post" onsubmit="event.preventDefault();">
+                                <div class="row register-form">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" placeholder="Item Name" id="item_name" value="">
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" placeholder="Description" id="description" value="">
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" placeholder="Quantity" id="quantity"value="">
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-6 category-row">
+                                    	<div class="form-group">
+                                            <select class="form-control" id="category_select">
+                                                <option class="hidden" selected="" disabled="">Please select Category</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer d-flex justify-content-center">
+                                	<button type="button" id="submit_additem">Add Item</button>
+                                </div>
+                                </form>
+
 	</div>
+
 	<div class="tab-pane fade" id="category">
 		<div class="container w-50">
 			<form method="post" action="/addcategories">
@@ -140,42 +170,15 @@
 		</div>
 
 	</div>
-	<div class="tab-pane fade" id="priceset">
-		<div class="container">
-			<span class="glyphicon glyphicon-plus"></span>
-			<div class="container w-100 h-auto p-3 my-auto mx-auto">
-				<div class="card-header bg-dark text-white">
-					Price Set
-				</div>
-				<div class="card-body bg-dark text-white">
-					<div class="dropdown">
-						<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						Dropdown button
-						</button>
-						<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-							<a class="dropdown-item" href="#">Action</a>
-							<a class="dropdown-item" href="#">Another action</a>
-							<a class="dropdown-item" href="#">Something else here</a>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="tab-pane fade" id="dropdown1">
-		<p>Etsy mixtape wayfarers, ethical wes anderson tofu before they sold out mcsweeney's organic lomo retro fanny pack lo-fi farm-to-table readymade. Messenger bag gentrify pitchfork tattooed craft beer, iphone skateboard locavore carles etsy salvia banksy hoodie helvetica. DIY synth PBR banksy irony. Leggings gentrify squid 8-bit cred pitchfork.</p>
-	</div>
-	<div class="tab-pane fade" id="dropdown2">
-		<p>Trust fund seitan letterpress, keytar raw denim keffiyeh etsy art party before they sold out master cleanse gluten-free squid scenester freegan cosby sweater. Fanny pack portland seitan DIY, art party locavore wolf cliche high life echo park Austin. Cred vinyl keffiyeh DIY salvia PBR, banh mi before they sold out farm-to-table VHS viral locavore cosby sweater.</p>
-	</div>
+
 </div>
 </div>
-<script>
+</div>
+{{-- <script>
 var token = "{{ csrf_token() }}";
 var url = "{{ route('edit') }}";
 var priceseturl = "{{ route('showpricesets') }}";
 var addpriceseturl = "{{ route('addpricesets') }}";
-var sampleurl = "{{ action('PricesetsController@showpricesets','categoryId') }}";
-console.log('ew',addpriceseturl);
-</script>
+
+</script> --}}
 @endsection

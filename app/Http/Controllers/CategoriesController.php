@@ -12,6 +12,13 @@ class CategoriesController extends Controller
 		$categories = Category::all();
 		return view('items.index',compact('categories'));
 	}
+    public function getcategory(){
+        return Category::all();
+    }
+    public function pricesets(Request $request){
+        $pricesets = Category::find($request->categoryid)->priceset;
+        return $pricesets;
+    }
 
    public function addcategories(CategoryFormRequest $request)
     {

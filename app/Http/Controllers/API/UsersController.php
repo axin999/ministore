@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserFormRequest;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Gate;
 use App\User;
 //use Intervention\Image\Facades\Image;
 
@@ -17,25 +18,37 @@ class UsersController extends Controller
         $this->middleware('auth:api');
     }
 	public function index(){
-		return User::latest()->paginate(10);
+        //$this->authorize('isAdmin');
+        if (Gate::allows('isAdmin') || Gate::allows('isUser')){
+            return User::latest()->paginate(1); 
+        }
+		
 	}
 
     public function profile(){
         return auth('api')->user();
     }
 
-    public function updateProfile(Request $request){
+    public function updateProfile(UserFormRequest $request){
 		$user = auth('api')->user();
+        $currentPhoto = $user->photo;
+
+/*        $this->validate($request,[
+            'email'=>'required|string|email|max:191|unique:users,email,'.$user->id,
+        ]);*/
 
         function getExtension ($mime_type){
-                $extensions = array('image/jpeg' => 'jpg',
-                'text/xml' => 'xml'
+                $extensions = array(
+                    'image/jpeg' => 'jpg',
+                    'text/xml' => 'xml',
+                    'image/png'  => 'png',
+                    'image/x-png' => 'png',
                 );
                 // Add as many other Mime Types / File Extensions as you like
                 return $extensions[$mime_type];
                 }
 
-        if(isset($request->photo)){
+        if(isset($request->photo) && $request->photo != $currentPhoto){
             $data = explode( ',', $request->photo );
             $imgdata = base64_decode($data[1]);
             $fifopen = finfo_open();
@@ -44,9 +57,24 @@ class UsersController extends Controller
             //$file_extension  = image_type_to_extension($photo_mime_type); 
             $file_extension  = getExtension($photo_mime_type);
             $save_filename = microtime() . '.' . $file_extension;
+            
             \Image::make($request->photo)->save(public_path('img/profile/').$save_filename);
+            $request->merge(['photo'=>$save_filename]);
+
+            $oldPhotodel = public_path('img/profile/').$currentPhoto;
+
+                if (file_exists($oldPhotodel)) {
+                    @unlink($oldPhotodel);                
+                };
         }
 
+            /*This is exmalple if only you are updating specific colum in database
+            $user->update(['photo'=> $request->photo]);*/
+        if(isset($request->password) && !empty($request->password)){
+            $request->merge(['password' => Hash::make($request['password'])]);
+        }
+         $user->update($request->all());
+        
 
 	}
 
@@ -76,8 +104,23 @@ class UsersController extends Controller
 
     public function destroy($id)
     {
+        $this->authorize('isAdmin');
+
     	$user = User::findOrFail($id);
     	$user -> delete();
     	return ['message' => 'user deleted'];
+    }
+
+    public function search(){
+        if($search = \Request::get('q')){
+            $users = User::where(function($query) use ($search){
+                    $query->where('name','LIKE',"%$search%")
+                    ->orWhere('email','LIKE','%search%')
+                    ->orWhere('type','LIKE','%search%');
+            })->paginate(1);
+        }else{
+            $users = User::latest()->paginate(1); 
+        }
+        return $users;
     }
 }

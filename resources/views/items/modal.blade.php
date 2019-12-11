@@ -39,7 +39,7 @@
           <div class="form-group">
             <label for="PriceSetType">Current Price Set:</label><br>
             <div class="row w-100 priceSetRow" id="contentPanel">
-              <div class="col-sm-6 d-flex" style="background-color: red;">
+             {{--  <div class="col-sm-6 d-flex" style="background-color: red;">
               <div class="col-sm-4 d-flex justify-content-center">
                 <label>Description</label>
               </div>
@@ -73,15 +73,15 @@
                 <button type="button" class="btn btn-xs btn-danger removeDescription">x</button>
               </div>
               @endforeach
-              @endif
+              @endif --}}
             </div>
-            <button type="button" id="asdf">ADD</button>
+            <button type="button" id="addElement_btn">ADD</button>
           </div>
         </form>
       </div>
       <!-- Modal footer -->
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" id="testingBtn">Testing</button>
+        <button type="button" class="btn btn-primary" id="addElement_btn">Testing</button>
         <button type="button" class="btn btn-primary" id="PriceSetBtnUpdate">Update</button>
         <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
       </div>

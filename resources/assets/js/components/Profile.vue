@@ -19,8 +19,10 @@
                     <h5 class="widget-user-desc">Web Designer</h5>
                 </div>
                 <div class="widget-user-image">
-                    <img class="img-circle" src="" alt="User Avatar">
+                    <img v-if="this.photochange == true" class="img-circle" :src="this.form.photo" alt="User Avatar">
+                    <img v-else class="img-circle" :src="getProfilePhoto()" alt="User Avatar">
                 </div>
+
                 <div class="box-footer">
                     <div class="row">
                         <div class="col-sm-4 border-right">
@@ -170,14 +172,16 @@
                         <label for="inputName" class="col-sm-2 control-label">Name</label>
 
                         <div class="col-sm-10">
-                          <input type="text" v-model="form.name" class="form-control" id="inputName" placeholder="Name">
+                          <input type="text" v-model="form.name" class="form-control" id="inputName" placeholder="Name" :class="{ 'is-invalid': form.errors.has('name') }">
+                          <has-error :form="form" field="name"></has-error>
                         </div>
                       </div>
                       <div class="form-group">
                         <label for="inputEmail" class="col-sm-2 control-label">Email</label>
 
                         <div class="col-sm-10">
-                          <input type="email" v-model="form.email" class="form-control" id="inputEmail" placeholder="Email">
+                          <input type="email" v-model="form.email" class="form-control" id="inputEmail" placeholder="Email" :class="{ 'is-invalid': form.errors.has('email') }">
+                          <has-error :form="form" field="email"></has-error>
                         </div>
                       </div>
                     <div class="form-group">
@@ -185,7 +189,7 @@
                         <div class="col-sm-10">
                         <div class="input-group">
                             <div class="custom-file">
-                                <input type="file" @change="updateProfile" class="custom-file-input" id="inputFilePhoto">
+                                <input  type="file" @change="updateProfile" class="custom-file-input" id="inputFilePhoto">
                                 <label class="custom-file-label" for="inputFilePhoto">Choose file</label>
                             </div>
                             <div class="input-group-append">
@@ -198,14 +202,15 @@
                         <label for="inputExperience" class="col-sm-2 control-label">Experience</label>
 
                         <div class="col-sm-10">
-                          <textarea class="form-control" id="inputExperience" placeholder="Experience"></textarea>
+                          <textarea v-model="form.bio" class="form-control" id="inputExperience" placeholder="Experience"></textarea>
                         </div>
                       </div>
                       <div class="form-group">
                         <label for="inputPassport" class="col-sm-2 control-label">Passport</label>
 
                         <div class="col-sm-10">
-                          <input type="text" class="form-control" id="inputPassport" placeholder="Passport">
+                          <input type="text" v-model="form.password" class="form-control" id="inputPassport" placeholder="Passport" :class="{ 'is-invalid': form.errors.has('password') }">
+                          <has-error :form="form" field="password"></has-error>
                         </div>
                       </div>
                       <div class="form-group">
@@ -231,6 +236,7 @@
     export default {
         data(){
             return{
+                photochange:false,
                 form: new Form({
                     id:'',
                     name:'',
@@ -246,28 +252,54 @@
             console.log('Component mounted.')
         },
         methods:{
+          getProfilePhoto(){
+            let prefix = (this.form.photo.match(/\//) ? '' : '/img/profile/');
+            return prefix + this.form.photo;
+          },
             updadateInfo(){
+                this.$Progress.start();
+
+                if(this.form.password == null || this.form.password == ""){
+                this.form.password = undefined;
+                 }
+
                 this.form.put('api/profile')
                 .then( ()=>{
-
+                    
+                    this.$Progress.finish();
                 })
-                .cath( () =>{
-
-                });
+                .catch( () =>{
+                     this.$Progress.fail();
+                })
             },
             updateProfile(pic){
+                this.photochange = true;
                 let file = pic.target.files[0];
                 let reader = new FileReader();
-                reader.onloadend = (file) => {
-                    this.form.photo = reader.result;
-                    console.log('RESULT',reader.result);
+                if(file['size'] < 2000000){
+                    reader.onloadend = (file) => {
+                        this.form.photo = reader.result;
+                        console.log('RESULT',reader.result);
+                    }
+                    reader.readAsDataURL(file);
                 }
-                reader.readAsDataURL(file);
+
+                else{
+                    swal.fire({
+                        type:'error',
+                        title:'Oops..',
+                        text:'You are uploading large file size'
+                    });
+                }
+                
             }
         },
         created(){
             Axios.get("api/profile").
-            then(({data}) => (this.form.fill(data)))
+            then(({data}) => {(this.form.fill(data))}).
+            catch(() =>{
+
+            })
 
         }
     }

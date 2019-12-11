@@ -5,17 +5,33 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\PricesetFormRequest;
 use App\Priceset;
+use DB;
 
 class PricesetsController extends Controller
 {
     //
     public function showpricesets(Request $request){
-        $uri = $request->path();
+        //$uri = $request->path();
+       /* The path method returns the request's path information. So, if the incoming request is targeted at http://domain.com/foo/bar, the path method will return foo/bar:*/
+       
     	//$pricesets = Priceset::all();
     	//return view('items.index',compact('pricesets'));
-        $pricesets = Priceset::where('category_id',$request->get('categoryid'))->get();
+        $pricesets = Priceset::where('category_id',$request->categoryid)
+        ->select('id AS pricesetid','category_id','priceset_type')
+        ->get();
         return $pricesets;
         //return view('index',compact('pricesets'))->render();
+    }
+
+    public function priceset_price(Request $request){
+        $prices = DB::table('pricesets AS ps')
+        ->join('prices AS pr','pr.priceset_id','ps.id')
+        ->where('ps.category_id','=',$request->categoryid)
+        ->where('pr.item_id','=',$request->itemid)
+        ->select('ps.id AS pricesetid','ps.category_id','ps.priceset_type','pr.id AS priceid','pr.item_id','pr.priceset_id','pr.price')
+        ->get();
+
+        return $prices;
     }
 
     public function addpriceset(PricesetFormRequest $request){
@@ -43,7 +59,7 @@ class PricesetsController extends Controller
     
     public function destroy($id){
         //DB::table('Priceset')->delete($id);
-        Priceset::where('priceset_id', $id)->delete();
+        Priceset::where('id', $id)->delete();
         //Priceset::find($id)->delete();
 
 

@@ -14,11 +14,19 @@
 /*Route::get('/', function () {
     return view('additems');
 });*/
+Route::get('/view_items', function(){
+
+	$items = App\Item::all();
+	return $items;
+});
 
 Route::post('/items', 'ItemsController@index');
-
+Route::get('/showitemlist', 'ItemsController@showitemlist');
+Route::get('/showpricesetprice', 'PricesetsController@priceset_price');
+Route::put('/updateitemlist/{id}', 'ItemsController@updateitemlist');
+Route::get('/getcategory', 'CategoriesController@getcategory');
 Route::resource('taemomalaki','CategoriesController');
-Route::get('/', 'CategoriesController@index');
+Route::get('/addcategories', 'CategoriesController@index');
 Route::post('/additem','ItemsController@additems');
 Route::post('/addcategories', 'CategoriesController@addcategories');
 Route::post('/addpricesets', 'PricesetsController@addpriceset');
@@ -40,7 +48,9 @@ Route::get('/addpricesets',[
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
-Route::get('/users', 'UsersController@index');
+//Route::get('/users', 'UsersController@index');
 //Route::get('{path}', 'HomeController@index')->where('path','.*');
 //Route::get('{path}',"HomeController@index")->where( 'path', '([A-z\d-\/_.]+)?' );
 Route::get('{path}', 'HomeController@index')->where( 'path' , '([A-z\d\-\/_.]+)?' );
+
+

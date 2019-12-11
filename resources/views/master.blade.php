@@ -11,10 +11,10 @@
 
 		<div id="app">
 		@include('sketchynav')
-		
+		@yield('content')
 		<router-view></router-view>
 			
-		@yield('content')
+		
 		
 
 
@@ -25,8 +25,9 @@
 
 
 		
-		<script src="{{ asset('js/bootstrap.js') }}"></script>
-{{-- 		<script src="{!! asset('js/app.js') !!}"></script> --}}
+		{{-- <script src="{{ asset('js/bootstrap.js') }}"></script> --}}
+		<script src="{{ asset('js/app.js') }}"></script>
+
 		<script>
 		</script>
 	</body>

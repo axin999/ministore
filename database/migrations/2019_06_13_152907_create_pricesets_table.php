@@ -13,9 +13,9 @@ class CreatePricesetsTable extends Migration
      */
     public function up()
     {
-        Schema::dropIfExists('pricesets');
+        
         Schema::create('pricesets',function(Blueprint $table){
-            $table->increments('priceset_id');
+            $table->increments('id');
             $table->integer('category_id');
             $table->string('priceset_type');
             $table->string('slug')->nullable();

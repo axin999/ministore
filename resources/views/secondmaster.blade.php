@@ -37,9 +37,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- SEARCH FORM -->
     <form class="form-inline ml-3">
       <div class="input-group input-group-sm">
-        <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
+        <input class="form-control form-control-navbar" @keydown="searchit" v-model="search" type="search" placeholder="Search" aria-label="Search">
         <div class="input-group-append">
-          <button class="btn btn-navbar" type="submit">
+          <button type="button"class="btn btn-navbar" @click="searchit">
             <i class="fas fa-search"></i>
           </button>
         </div>
@@ -144,7 +144,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="index3.html" class="brand-link">
+    <a href="/" class="brand-link">
       <img src="{{ asset('img/store.png') }}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
            style="opacity: .8">
       <span class="brand-text font-weight-light">Mini Store</span>
@@ -158,7 +158,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <img src="{{ asset('img/chubby.png') }}" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-        	<router-link class="d-block" to="/users">{{ Auth::user()->name }}</router-link>
+        	<router-link id="auth-user-name" class="d-block router-deactive" to="/profile">{{ Auth::user()->name }}
+            <p>{{ Auth::user()->type }}</p>
+          </router-link>
          
         </div>
       </div>
@@ -169,15 +171,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
 			<li class="nav-item">
-				<router-link to="/dashboard" class="nav-link">
-					<i class="nav-icon fas fa-tachometer-alt text-blue"></i>
+				<router-link to="pricelist" class="nav-link nav-vue-comp">
+					<i class="nav-icon fas fa-clipboard-list text-blue"></i>
 					<p>
-						Dashboard
+						Price List
 						{{-- <span class="right badge badge-danger">New</span> --}}
 					</p>
 				</router-link>
 			</li>
-			<li class="nav-item">
+			<li class="nav-item nav-vue-comp">
 				<router-link to="/profile" class="nav-link">
 				<i class="nav-icon fas fa-user text-orange"></i>
 				<p>
@@ -186,15 +188,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
 				</p>
 				</router-link>
 			</li>
-			<li class="nav-item">
-				<router-link to="/developer" class="nav-link">
-					<i class="nav-icon fas fa-cogs"></i>
-					<p>
-						Developer
-						{{-- <span class="right badge badge-danger">New</span> --}}
-					</p>
-				</router-link>
-			</li>
+      
+			
+     
 				
 				<a class="nav-link" href="{{ route('logout') }}"
 					onclick="event.preventDefault();
@@ -209,6 +205,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 					{{ csrf_field() }}
 				</form>
 			</li>
+          @can('isAdmin')
           <li class="nav-item has-treeview menu-open">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-cog text-green"></i>
@@ -218,7 +215,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               </p>
             </a>
             <ul class="nav nav-treeview">
-              <li class="nav-item">
+              <li class="nav-item nav-vue-comp">
               	<router-link to="/users" class="nav-link">
               		<i class="far fa-circle nav-icon"></i>
                   	<p>User</p>
@@ -226,14 +223,23 @@ scratch. This page gets rid of all links and provides the needed markup only.
              
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="addcategories" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Inactive Page</p>
+                  <p>Add Item & Category</p>
                 </a>
+              </li>
+              <li class="nav-item nav-vue-comp">
+                <router-link to="/developer" class="nav-link">
+                <i class="nav-icon fas fa-cogs"></i>
+                <p>
+                  Developer
+                  {{-- <span class="right badge badge-danger">New</span> --}}
+                </p>
+                </router-link>
               </li>
             </ul>
           </li>
-
+          @endcan
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
@@ -252,9 +258,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
       <div class="container-fluid">
       	<router-view></router-view>
       	<vue-progress-bar></vue-progress-bar>
+        @yield('content')
         <!-- /.row -->
       </div><!-- /.container-fluid -->
     </div>
+
+
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
@@ -282,9 +291,27 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <!-- ./wrapper -->
 
 <!-- REQUIRED SCRIPTS -->
+@auth
+  <script>
+    window.user = {!! json_encode(auth()->user()) !!};
+  </script>
+@endauth
 
 <script src="{{ asset('js/app.js') }}"></script>
+
+
+<script>
+var token = "{{ csrf_token() }}";
+var url = "{{ route('edit') }}";
+var priceseturl = "{{ route('showpricesets') }}";
+var addpriceseturl = "{{ route('addpricesets') }}";
+
+  $('.nav-vue-comp').click(function(){
+      $('#pricesection').hide();
+  })
+
 </script>
+
 
 </body>
 </html>

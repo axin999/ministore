@@ -1,9 +1,15 @@
 <template id="user-list">
-<div class="row">
+<div class="container">
+<div v-if="!$gate.isAdmin()">
+	<not-found></not-found>
+</div>
+<div class="row" v-if="$gate.isAdmin()">
+	
+
           <div class="col-12">
             <div class="card">
               <div class="card-header">
-                <h3 class="card-title">Responsive Hover Table</h3>
+                <h3 class="card-title">Price List</h3>
 
                 <div class="card-tools">
 					<button type="button" class="btn btn-success" @click="newModal" data-target="#addUserModal">
@@ -19,14 +25,16 @@
                       <th>ID</th>
                       <th>Name</th>
                       <th>Email</th>
+                      <th>Type</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                   <tr v-for="(user,index) in users">
+                   <tr v-for="(user,index) in users.data">
                       <td>{{ user.id }}</td>
                       <td>{{ user.name | capitalize }}</td>
                       <td>{{ user.email }}</td>
+                      <td>{{ user.type }}</td>
                       <td>{{ user.created_at | timeToStrFromat }}</td>
                       <td>
                       	<a href="#" @click="editModal(user)"><i class="fa fa-edit text-blue"></i></a>
@@ -38,6 +46,9 @@
                 </table>
               </div>
               <!-- /.card-body -->
+				<div class="card-footer">
+					<pagination :data="users" @pagination-change-page="getResults"></pagination>
+				</div>
             </div>
             <!-- /.card -->
           </div>
@@ -99,8 +110,8 @@
 			    </div>
 			  </div>
 			</div>
-        </div>
-
+</div>
+</div>
 
 </template>
 
@@ -143,12 +154,18 @@
 			}		
 		},
 		methods:{
+			getResults(page = 1) {
+			axios.get('api/users?page=' + page)
+				.then(response => {
+					this.users = response.data;
+				});
+			},
 			updateUser(id){
 				this.$Progress.start();
 				this.form.put('api/users/'+this.form.id)
 				.then(()=>{
 					$('#addUserModal').modal('hide');
-					swal.fire("Updated","There are something wrong.", "success");
+					swal.fire("Updated","Update success.", "success");
 					this.$Progress.finish();
 					VueFire.$emit('AfterCreate');
 				})
@@ -214,11 +231,30 @@
 
 			},
 			loadUsers(){
-				Axios.get("api/users").then(({data}) => (this.users = data.data));
+				if (this.$gate.isAdmin()) {
+					Axios.get("api/users").then(({data}) => (this.users = data));
+				}
+				
+				
 				
 			}
 		},
 		created(){
+			VueFire.$on('searching',()=>{
+				let query = this.$parent.search;
+				Axios.get('api/findUser?q=' + query)
+				.then((data) =>{
+					this.users = data.data
+
+				})
+				.catch(()=>{
+					swal.fire({
+						title:"Search Fail",
+						text:"Something is not right",
+						type:"warning",
+						});
+				})
+			})
 
 			 	this.loadUsers();
 			 	VueFire.$on('AfterCreate', () => {

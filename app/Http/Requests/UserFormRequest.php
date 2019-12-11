@@ -34,11 +34,13 @@ class UserFormRequest extends FormRequest
      * @return array
      */
     public function rules()
+    
     {
+        $user = auth('api')->user();
         return [
             'name'=>'required|string|min:5|max:191',
-            'email'=>'required|string|email|max:191|unique:users',
-            'password'=>'required|string|min:6'
+            'email'=>'required|string|email|max:191|unique:users,email,'.$user->id,
+            'password'=>'sometimes|required|string|min:6'
         ];
     }
 
